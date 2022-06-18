@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="author" content="YYT">
+    <title>Shinhan_Edu</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <script src="js/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <p><img src ="img/shedu_1.png"></p>
+
+        <label for="name" class="col-lg-2 control-label"></label>
+        <input id="NodeInfo" type="text" hidden>
+		<hr>
+		<p>Account : <input id="Account" type="text"> </p>
+        <p>Balance : <input id="Balance" type="text"></p>
+		 <button id="checkBalance">Check Balance</button>
+
+		<label for="name" class="col-lg-2 control-label"><h3>로그인</h3></label>
+        <button id="Login">Login</button>
+		<button id="New">create_account</button>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+    
+		$( document ).ready(function() {
+			console.log( "ready!" );
+			
+			if (typeof web3 !== 'undefined') {
+				web3 = new Web3(web3.currentProvider);
+			} else {
+					// set the provider you want from Web3.providers
+				web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+			}
+			web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+			/* Get Node Info */
+			web3.eth.getNodeInfo(function(error, result){
+				if(error){
+					console.log( "error" ,error);
+				}
+				else{
+					console.log( "result",result );
+					$('#NodeInfo').val(result);
+				}
+			});
+			
+			/*Get Balance */
+			web3.eth.getAccounts(function(error, accounts) {
+				if(error) {
+					console.log(error);
+				}
+				$('#Account').val(accounts[0]);
+				web3.eth.getBalance(accounts[0]).then(function(result){
+					console.log( "Balance : " ,web3.utils.fromWei(result, 'ether'));
+					$('#Balance').val(web3.utils.fromWei(result, 'ether'));
+				});
+			});
+			
+			$('#checkBalance').click(function() {
+			    var _account = $('#Account').val();
+				web3.eth.getBalance(_account).then(function(result){
+					console.log( "Balance : " ,web3.utils.fromWei(result, 'ether'));
+					$('#Balance').val(web3.utils.fromWei(result, 'ether'));
+				});
+			});
+
+			$('#new').click(function() {
+				web3.eth.accounts.create();
+			});
+			
+
+			/* Login */
+			$('#Login').click(function() {
+
+				var _from = $('#Account').val();
+
+				web3.eth.getBalance(_from).then(function(result){
+					console.log( "Balance : " ,web3.utils.fromWei(result, 'ether'));
+					$('#Balance').val(web3.utils.fromWei(result, 'ether'));
+				});
+				if( $('#Balance').val() >= 0){
+					alert("로그인"+$('#Balance').val());
+					location.href="blockchain_edu_select.html";
+				}
+				
+			});
+		});
+	
+    </script>
+
+</body>
+</html>
