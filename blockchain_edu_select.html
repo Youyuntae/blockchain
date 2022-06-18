@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="author" content="You">
+    <title>Shinhan_edu</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <script src="js/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <p><img src ="img/shedu_1.png"></p>
+
+        <label for="name" class="col-lg-2 control-label"></label>
+        <input id="NodeInfo" type="text" hidden>
+		<hr>
+
+        <label for="name" class="col-lg-2 control-label"></label>
+		<p>Account : <input id="Account" type="text"> </p>
+        <p hidden>Account1 : <input id="Account_T1" type="text">
+			      Account2 : <input id="Account_T2" type="text">
+				  Account3 : <input id="Account_T3" type="text"> </p>
+        
+        <p>Balance : <input id="Balance" type="text"> <button id="checkBalance">잔액조회</button></p>
+		
+		<label for="name" class="col-lg-2 control-label"><p>강의구입</p></label>
+		<p>From : &nbsp &nbsp &nbsp <input id="From" type="text"> </p>
+		<!--<p>To : &nbsp &nbsp &nbsp &nbsp &nbsp <input id="To" type="text"> </p> -->
+        <div><input type="radio" id ="tutor1" name="tutor" /> 강의1</div>
+        <div><input type="radio" id ="tutor2" name="tutor" /> 강의2</div>
+        <div><input type="radio" id ="tutor3" name="tutor" /> 강의3</div>
+        <p>Amount : &nbsp <input id="Amount" type="text"><button id="Transfer">Transfer</button></p>
+        
+        <p>Transaction Hash : &nbsp  <span id="Tx"></span></p>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+    
+		$( document ).ready(function() {
+			console.log( "ready!" );
+			
+			if (typeof web3 !== 'undefined') {
+				web3 = new Web3(web3.currentProvider);
+			} else {
+					// set the provider you want from Web3.providers
+				web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+			}
+			web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+			/* Get Node Info */
+			web3.eth.getNodeInfo(function(error, result){
+				if(error){
+					console.log( "error" ,error);
+				}
+				else{
+					console.log( "result",result );
+					$('#NodeInfo').val(result);
+				}
+			});
+			
+			/*Get Balance */
+			web3.eth.getAccounts(function(error, accounts) {
+				if(error) {
+					console.log(error);
+				}
+				$('#Account').val(accounts[0]);
+                $('#From').val(accounts[0]);
+
+				$('#Account_T1').val(accounts[1]);
+				$('#Account_T2').val(accounts[2]);
+				$('#Account_T3').val(accounts[3]);
+				
+                web3.eth.getBalance(accounts[0]).then(function(result){
+					console.log( "Balance : " ,web3.utils.fromWei(result, 'ether'));
+					$('#Balance').val(web3.utils.fromWei(result, 'ether'));
+				});
+			});
+			
+            /* checkBalance */
+			$('#checkBalance').click(function() {
+			    var _account = $('#Account').val();
+				web3.eth.getBalance(_account).then(function(result){
+					console.log( "Balance : " ,web3.utils.fromWei(result, 'ether'));
+					$('#Balance').val(web3.utils.fromWei(result, 'ether'));
+				});
+			});
+
+		
+		});
+
+        /* Transfer */
+			$('#Transfer').click(function() {
+				$('#Tx').text('');
+				var _from = $('#From').val();
+                
+                if(tutor1.checked){
+                    var _to = $('#Account_T1').val();
+                    alert("전송주소1"+_to);
+                }
+                if(tutor2.checked){
+                    var _to = $('#Account_T2').val();
+                    alert("전송주소2"+_to);
+                }
+                if(tutor3.checked){
+                    var _to = $('#Account_T3').val();
+                    alert("전송주소3"+_to);
+                }
+				var _Amount = $('#Amount').val();
+				var txnObject = {
+					"from":_from,
+					"to": _to,
+					"value": web3.utils.toWei(_Amount,'ether'),
+					// "gas": 21000,         (optional)
+					// "gasPrice": 4500000,  (optional)
+					// "data": 'For testing' (optional)
+					// "nonce": 10           (optional)
+				}
+			
+				web3.eth.sendTransaction(txnObject, function(error, result){
+					if(error){
+						console.log( "Transaction error" ,error);
+					}
+					else{
+						var txn_hash = result; //Get transaction hash
+						$('#Tx').text(txn_hash);
+					}
+				});
+				
+			});
+
+    </script>
+
+</body>
+</html>
